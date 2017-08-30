@@ -260,6 +260,22 @@ static void * KVOContext = &KVOContext;
     wkWebView.allowsLinkPreview = [settings cordovaBoolSettingForKey:@"AllowLinkPreview" defaultValue:NO];
     wkWebView.scrollView.scrollEnabled = [settings cordovaBoolSettingForKey:@"ScrollEnabled" defaultValue:NO];
     wkWebView.allowsBackForwardNavigationGestures = [settings cordovaBoolSettingForKey:@"AllowBackForwardNavigationGestures" defaultValue:NO];
+
+     // By default, DisallowOverscroll is false (thus bounce is allowed)
+    BOOL bounceAllowed = !([settings cordovaBoolSettingForKey:@"DisallowOverscroll" defaultValue:NO]);
+
+    // prevent webView from bouncing
+    if (!bounceAllowed) {
+        if ([wkWebView respondsToSelector:@selector(scrollView)]) {
+            ((UIScrollView*)[wkWebView scrollView]).bounces = NO;
+        } else {
+            for (id subview in wkWebView.subviews) {
+                if ([[subview class] isSubclassOfClass:[UIScrollView class]]) {
+                    ((UIScrollView*)subview).bounces = NO;
+                }
+            }
+        }
+    }
 }
 
 - (void)updateWithInfo:(NSDictionary*)info
